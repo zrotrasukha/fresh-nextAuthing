@@ -2,20 +2,23 @@ import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 import User from "@/models/userModel";
 
-
 export const sendEmail = async ({ email, emailType, userId }: any) => {
   try {
     const hashedToken = await bcrypt.hash(userId.toString(), 10);
 
     if (emailType === "VERIFY") {
       await User.findByIdAndUpdate(userId, {
-        verifyToken: hashedToken,
-        verifyTokenExpiry: Date.now() + 3600000,
+        $set: {
+          verifyToken: hashedToken,
+          verifyTokenExpiry: Date.now() + 3600000,
+        },
       });
     } else if (emailType === "RESET") {
       await User.findByIdAndUpdate(userId, {
-        fogotPasswordToken: hashedToken,
-        forgotPasswordTokenExpiry: Date.now() + 3600000,
+        $set: {
+          fogotPasswordToken: hashedToken,
+          forgotPasswordTokenExpiry: Date.now() + 3600000,
+        },
       });
     }
 
@@ -33,7 +36,7 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
       to: email,
       subject:
         emailType === "VERIFY" ? "Veryfy your email" : "Reset your password",
-      html: `<p> Click <a href="${process.env.DOMAIN}/verifyEmail?token=${hashedToken}">here</a> to ${emailType === "VERIFY" ? "verify your email" : "reset your password"} or copy and paste the link below in your browser. <br> ${process.env.DOMAIN}/verifyEmail?token=${hashedToken} </p>`,
+      html: `<p> Click <a href="${process.env.DOMAIN}/verifyemail?token=${hashedToken}">here</a> to ${emailType === "VERIFY" ? "verify your email" : "reset your password"} or copy and paste the link below in your browser. <br> ${process.env.DOMAIN}/verifyEmail?token=${hashedToken} </p>`,
     };
 
     const mailResponse = await transporter.sendMail(mailOptions);

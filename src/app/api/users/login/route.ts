@@ -43,6 +43,8 @@ export const POST = async (request: NextRequest) => {
       httpOnly: true // HTTP-only cookies can't be accessed from client-side JavaScript, so third-party scripts and browser extensions won't even know they exist. It is much safer than storing them in localstorage. 
 
     })
+
+    return response;
   } catch (error: any) {
     return NextResponse.json(
       {
